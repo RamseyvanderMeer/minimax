@@ -50,9 +50,9 @@ class Main:
         self.buttons[x,y]['state'] = 'normal'
       else:
         self.buttons[x,y]['state'] = 'disabled'
-    winning = self.board.won()
-    if winning:
-      for x,y in winning:
+    won = self.board.won()
+    if won:
+      for x,y in won:
         self.buttons[x,y]['disabledforeground'] = 'red'
       for x,y in self.buttons:
         self.buttons[x,y]['state'] = 'disabled'

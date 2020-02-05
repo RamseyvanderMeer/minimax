@@ -7,52 +7,19 @@ from copy import deepcopy
 class Player:
   
   def __init__(self,other=None):
-    self.O = 'O'
-    self.X = 'X'
+    self.player = 'O'
+    self.ai = 'X'
     self.empty = ' '
     self.size = 3
     self.fields = {}
+    self.score = 0
     for y in range(self.size):
       for x in range(self.size):
         self.fields[x,y] = self.empty
-    # copy constructor
+    
     if other:
       self.__dict__ = deepcopy(other.__dict__)
       
-  def move(self,x,y):
-    board = Player(self)
-    board.fields[x,y] = board.O
-    (board.O,board.X) = (board.X,board.O)
-    return board
-  
-  def __minimax(self, O):
-    if self.won():
-      if O:
-        return (-1,None)
-      else:
-        return (+1,None)
-    elif self.tied():
-      return (0,None)
-    elif O:
-      best = (-2,None)
-      for x,y in self.fields:
-        if self.fields[x,y]==self.empty:
-          value = self.move(x,y).__minimax(not O)[0]
-          if value>best[0]:
-            best = (value,(x,y))
-      return best
-    else:
-      best = (+2,None)
-      for x,y in self.fields:
-        if self.fields[x,y]==self.empty:
-          value = self.move(x,y).__minimax(not O)[0]
-          if value<best[0]:
-            best = (value,(x,y))
-      return best
-  
-  def best(self):
-    return self.__minimax(True)[1]
-  
   def tied(self):
     for (x,y) in self.fields:
       if self.fields[x,y]==self.empty:
@@ -64,7 +31,7 @@ class Player:
     for y in range(self.size):
       winning = []
       for x in range(self.size):
-        if self.fields[x,y] == self.X:
+        if self.fields[x,y] == self.ai:
           winning.append((x,y))
       if len(winning) == self.size:
         return winning
@@ -72,7 +39,7 @@ class Player:
     for x in range(self.size):
       winning = []
       for y in range(self.size):
-        if self.fields[x,y] == self.X:
+        if self.fields[x,y] == self.ai:
           winning.append((x,y))
       if len(winning) == self.size:
         return winning
@@ -80,7 +47,7 @@ class Player:
     winning = []
     for y in range(self.size):
       x = y
-      if self.fields[x,y] == self.X:
+      if self.fields[x,y] == self.ai:
         winning.append((x,y))
     if len(winning) == self.size:
       return winning
@@ -88,12 +55,46 @@ class Player:
     winning = []
     for y in range(self.size):
       x = self.size-1-y
-      if self.fields[x,y] == self.X:
+      if self.fields[x,y] == self.ai:
         winning.append((x,y))
     if len(winning) == self.size:
       return winning
     # default
-    return None
+    return None 
+  
+  def move(self,x,y):
+    board = Player(self)
+    board.fields[x,y] = board.player
+    (board.player,board.ai) = (board.ai,board.player)
+    return board
+  
+  def __minimax(self, O):
+    if self.won():
+      if O:
+        return (-5,None)
+      else:
+        return (+5,None)
+    elif self.tied():
+      return (0,None)
+    elif O:
+      best = (-10,None)
+      for x,y in self.fields:
+        if self.fields[x,y]==self.empty:
+          value = self.move(x,y).__minimax(not O)[0]
+          if value>best[0]:
+            best = (value,(x,y))
+      return best
+    else:
+      best = (+10,None)
+      for x,y in self.fields:
+        if self.fields[x,y]==self.empty:
+          value = self.move(x,y).__minimax(not O)[0]
+          if value<best[0]:
+            best = (value,(x,y))
+      return best
+  
+  def best(self):
+    return self.__minimax(True)[0]
   
   def __str__(self):
     string = ''
